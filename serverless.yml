@@ -1,0 +1,59 @@
+service: lambda-ddb-crud-template
+frameworkVersion: '3'
+
+custom:
+  TABLE_NAME: '${self:service}-${sls:stage}-users'
+
+provider:
+  name: aws
+  deploymentMethod: direct
+  runtime: nodejs14.x
+  stage: ${env:STAGE, 'dev'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ Table, Arn ]
+  environment:
+    TABLE_NAME: ${self:custom.TABLE_NAME}
+
+resources:
+  Resources:
+    Table:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:              
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+functions:
+  item:
+    timeout: 25
+    memorySize: 128
+    handler: serverless.handler
+    events:
+      - httpApi:
+          path: '/api/items/{id}'
+          method: 'ANY'
+      - httpApi:
+          path: '/api/items'
+          method: 'ANY'
+
+
+plugins:
+  - serverless-offline
