@@ -1,7 +1,7 @@
 const mItems = require("../models/items")
 
 module.exports = {
-    async Get(req, res) {
+    async Get(req, res, next) {
         var u
 
         try {
@@ -12,42 +12,26 @@ module.exports = {
             }
 
             if (u) {
-                res.status(200).json(i)
+                res.status(200).json(u)
             } else {
                 res.status(404).send()
             }
 
-        } catch {
-            res.status(500).send(
-                
-            )
-        }
+        } catch (err) { next(err) }
     },
-    async Put(req, res) {
+    async Put(req, res, next) {
         try {
             res.status(204).send(mItems.Put())
-        } catch {
-            res.status(500).send(
-                
-            )
-        }
+        } catch (err) { next(err) }
     },
-    async Post(req, res) {
+    async Post(req, res, next) {
         try {
             res.status(204).send(mItems.Post())
-        } catch {
-            res.status(500).send(
-                
-            )
-        }
+        } catch (err) { next(err) }
     },
-    async Delete(req, res) {
+    async Delete(req, res, next) {
         try {
             res.status(204).send(mItems.Delete(req.params.id))
-        } catch {
-            res.status(500).send(
-                
-            )
-        }
+        } catch (err) { next(err) }
     }
 }

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Sceptyre/lambda-ddb-crud-template#readme",
   "dependencies": {
     "aws-sdk": "^2.1268.0",
+    "body-parser": "^1.20.1",
     "express": "^4.18.2",
     "serverless-http": "^3.1.0"
   },
