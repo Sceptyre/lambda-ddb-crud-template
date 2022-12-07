@@ -8,11 +8,11 @@ module.exports = class {
         this.OBJECT_SCHEMA = objectSchema
     }
 
-    static #validateKeys(data) {
+    #validateKeys(data) {
         return Object.keys(data) == Object.keys(this.OBJECT_SCHEMA)
     }
 
-    static #validateValues(data) {
+    #validateValues(data) {
         for (k in Object.keys(data)) {
             if (typeof data[k] != typeof this.objectSchema[k]) {
                 return false
@@ -20,22 +20,22 @@ module.exports = class {
         }
     }
 
-    static ValidateData(data) {
+    ValidateData(data) {
         return typeof data == typeof Object() && this.#validateKeys(data) && this.#validateValues(data)
     }
 
-    static async Get(filter) {
+    async Get(filter) {
         let i = await ddb.scan({
-            TableName: TABLE_NAME,
+            TableName: this.TABLE_NAME,
             FilterExpression: filter
         }).promise()
 
         return i.Items
     }
 
-    static async GetById(id) {
+    async GetById(id) {
         let i = await ddb.get({
-            TableName: TABLE_NAME,
+            TableName: this.TABLE_NAME,
             Key: { [this.PRIMARY_KEY] : id }
         }).promise()
 
@@ -46,22 +46,22 @@ module.exports = class {
         return i.Item
     }
 
-    static async Create(data) {        
+    async Create(data) {        
         if (!this.ValidateData(data)) { return new Error("Submitted Data Is Invalid") }
 
         let i = await ddb.put({
-            TableName: TABLE_NAME,
+            TableName: this.TABLE_NAME,
             Item: data
         }).promise()
 
         return i.Item
     }
 
-    static async Update(id, data) {
+    async Update(id, data) {
         if (!this.ValidateData(data)) { return new Error("Submitted Data Is Invalid") }
 
         let i = await ddb.update({
-            TableName: TABLE_NAME,
+            TableName: this.TABLE_NAME,
             Key: { [this.PRIMARY_KEY] : id },
             Item: data
         }).promise()
@@ -69,9 +69,9 @@ module.exports = class {
         return i.Item
     }
 
-    static async Delete(id) {
+    async Delete(id) {
         let i = await ddb.delete({
-            TableName: TABLE_NAME,
+            TableName: this.TABLE_NAME,
             Key: { [this.PRIMARY_KEY] : id }
         }).promise()
 
