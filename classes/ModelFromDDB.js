@@ -21,7 +21,7 @@ module.exports = class {
     }
 
     ValidateData(data) {
-        return typeof data == typeof Object() && this.#validateKeys(data) && this.#validateValues(data)
+        return typeof data instanceof Object && this.#validateKeys(data) && this.#validateValues(data)
     }
 
     async Get(filter) {
