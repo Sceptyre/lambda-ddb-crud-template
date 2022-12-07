@@ -20,19 +20,21 @@ module.exports = class {
     }
 
     #validateKeys(data) {
-        return Object.keys(data) == Object.keys(this.OBJECT_SCHEMA)
+        return Object.keys(data).toString() == Object.keys(this.OBJECT_SCHEMA).toString()
     }
 
     #validateValues(data) {
-        for (k in Object.keys(data)) {
-            if (typeof data[k] != typeof this.objectSchema[k]) {
+        for (var k in data) {
+            if (typeof data[k] != typeof this.OBJECT_SCHEMA[k]) {
                 return false
             }
         }
+
+        return true
     }
 
     ValidateData(data) {
-        return typeof data instanceof Object && this.#validateKeys(data) && this.#validateValues(data)
+        return typeof data == typeof Object() && this.#validateKeys(data) && this.#validateValues(data)
     }
 
 

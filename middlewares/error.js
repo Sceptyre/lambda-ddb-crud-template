@@ -1,8 +1,7 @@
 module.exports = async function(err, req, res, next) {
-    console.log(err)
-
     let errorResponse = {
-        message: err.message
+        message: err.message,
+        code: err?.code
     }
 
     res.status(err?.code || 500).json(errorResponse)

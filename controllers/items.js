@@ -19,17 +19,18 @@ module.exports = {
     },
     async Put(req, res, next) {
         try {
-            res.status(204).send(mItems.Put())
+            res.status(200).json(await mItems.Update(req.params.id, req.body))
         } catch (err) { next(err) }
     },
     async Post(req, res, next) {
+        console.log(req.body)
         try {
-            res.status(204).send(mItems.Post())
+            res.status(201).json(await mItems.Create(req.body))
         } catch (err) { next(err) }
     },
     async Delete(req, res, next) {
         try {
-            res.status(204).send(mItems.Delete(req.params.id))
+            res.status(204).json(await mItems.Delete(req.params.id))
         } catch (err) { next(err) }
     }
 }
