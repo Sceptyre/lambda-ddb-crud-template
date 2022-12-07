@@ -13,8 +13,8 @@ module.exports = class {
     }
 
     static #validateValues(data) {
-        for (k,v in data) {
-            if (typeof v != typeof this.objectSchema[k]) {
+        for (k in Object.keys(data)) {
+            if (typeof data[k] != typeof this.objectSchema[k]) {
                 return false
             }
         }
