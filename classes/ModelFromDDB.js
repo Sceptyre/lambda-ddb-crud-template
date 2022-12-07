@@ -5,7 +5,16 @@ module.exports = class {
     constructor(tableName, primaryKey = "id", objectSchema = {}) {
         this.TABLE_NAME = tableName
         this.PRIMARY_KEY = primaryKey
-        this.OBJECT_SCHEMA = objectSchema
+        this.OBJECT_SCHEMA = {
+            [ primaryKey ]: String(),
+            ...objectSchema // Apply defined objectSchema and enforce defined primary key
+        }
+    }
+
+
+    // Data validators
+    #validateID(id) {
+        return typeof id == typeof this.OBJECT_SCHEMA[this.PRIMARY_KEY]
     }
 
     #validateKeys(data) {
@@ -24,6 +33,8 @@ module.exports = class {
         return typeof data instanceof Object && this.#validateKeys(data) && this.#validateValues(data)
     }
 
+
+    // CRUD operations
     async Get(filter) {
         let i = await ddb.scan({
             TableName: this.TABLE_NAME,
@@ -34,20 +45,20 @@ module.exports = class {
     }
 
     async GetById(id) {
+        if (!this.#validateID(id)) { throw new Error(`Invalid resource id value: ${id}.`) }
+
         let i = await ddb.get({
             TableName: this.TABLE_NAME,
             Key: { [this.PRIMARY_KEY] : id }
         }).promise()
 
-        if (!i.Item) {
-            return new Error(`Id ${id} not found`)
-        }
+        if (!i.Item) { throw new Error(`Resource id: ${id} not found.`) }
 
         return i.Item
     }
 
     async Create(data) {        
-        if (!this.ValidateData(data)) { return new Error("Submitted Data Is Invalid") }
+        if (!this.ValidateData(data)) { throw new Error("Request body is invalid.") }
 
         let i = await ddb.put({
             TableName: this.TABLE_NAME,
@@ -58,7 +69,8 @@ module.exports = class {
     }
 
     async Update(id, data) {
-        if (!this.ValidateData(data)) { return new Error("Submitted Data Is Invalid") }
+        if (!this.#validateID(id)) { throw new Error(`Invalid resource id value: ${id}.`) }
+        if (!this.ValidateData(data)) { throw new Error("Request body is invalid.") }
 
         let i = await ddb.update({
             TableName: this.TABLE_NAME,
@@ -70,6 +82,8 @@ module.exports = class {
     }
 
     async Delete(id) {
+        if (!this.#validateID(id)) { throw new Error(`Invalid resource id value: ${id}.`) }
+
         let i = await ddb.delete({
             TableName: this.TABLE_NAME,
             Key: { [this.PRIMARY_KEY] : id }

@@ -5,16 +5,14 @@ module.exports = {
         var u
 
         try {
-            if (req.params.id) {
-                u = await mItems.GetById(req.params.id)
-            } else {
-                u = await mItems.Get(req.params.filter)
-            }
+            u = req.params.id ? // if
+                await mItems.GetById(req.params.id): // else
+                await mItems.Get(req.params.filter)
 
             if (u) {
                 res.status(200).json(u)
             } else {
-                res.status(404).send()
+                res.status(404).json()
             }
 
         } catch (err) { next(err) }
