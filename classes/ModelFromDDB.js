@@ -76,10 +76,12 @@ module.exports = class {
         if (!this.#validateID(id)) { throw new APIError(`Invalid resource id value: ${id}.`, 400) }
         if (!this.ValidateData(data)) { throw new APIError("Request body is invalid.", 400) }
 
-        let i = await ddb.update({
+        // Maintain ID
+        data[this.PRIMARY_KEY] = id
+
+        let i = await ddb.put({
             TableName: this.TABLE_NAME,
-            Key: { [this.PRIMARY_KEY] : id },
-            Item: data
+            Item: data,
         }).promise()
 
         return i.Item
