@@ -1,3 +1,9 @@
 module.exports = async function(err, req, res, next) {
-    res.status(500).send(err.message)
+    console.log(err)
+
+    let errorResponse = {
+        message: err.message
+    }
+
+    res.status(err?.code || 500).json(errorResponse)
 }

@@ -1,3 +1,5 @@
+const APIError = require('./APIError')
+
 const AWS = require('aws-sdk')
 const ddb = new AWS.DynamoDB.DocumentClient()
 
@@ -45,20 +47,20 @@ module.exports = class {
     }
 
     async GetById(id) {
-        if (!this.#validateID(id)) { throw new Error(`Invalid resource id value: ${id}.`) }
+        if (!this.#validateID(id)) { throw new APIError(`Invalid resource id value: ${id}.`, 400) }
 
         let i = await ddb.get({
             TableName: this.TABLE_NAME,
             Key: { [this.PRIMARY_KEY] : id }
         }).promise()
 
-        if (!i.Item) { throw new Error(`Resource id: ${id} not found.`) }
+        if (!i.Item) { throw new APIError(`Resource id: ${id} not found.`, 404) }
 
         return i.Item
     }
 
     async Create(data) {        
-        if (!this.ValidateData(data)) { throw new Error("Request body is invalid.") }
+        if (!this.ValidateData(data)) { throw new APIError("Request body is invalid.", 400) }
 
         let i = await ddb.put({
             TableName: this.TABLE_NAME,
@@ -69,8 +71,8 @@ module.exports = class {
     }
 
     async Update(id, data) {
-        if (!this.#validateID(id)) { throw new Error(`Invalid resource id value: ${id}.`) }
-        if (!this.ValidateData(data)) { throw new Error("Request body is invalid.") }
+        if (!this.#validateID(id)) { throw new APIError(`Invalid resource id value: ${id}.`, 400) }
+        if (!this.ValidateData(data)) { throw new APIError("Request body is invalid.", 400) }
 
         let i = await ddb.update({
             TableName: this.TABLE_NAME,
@@ -82,7 +84,7 @@ module.exports = class {
     }
 
     async Delete(id) {
-        if (!this.#validateID(id)) { throw new Error(`Invalid resource id value: ${id}.`) }
+        if (!this.#validateID(id)) { throw new APIError(`Invalid resource id value: ${id}.`, 400) }
 
         let i = await ddb.delete({
             TableName: this.TABLE_NAME,
